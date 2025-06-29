@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,9 +19,7 @@ export default function PlatformSettingsPage() {
     phone: "",
   })
 
-  const [addresses, setAddresses] = useState([
-    { id: 1, street: "ул. Морская, д. 10", city: "Москва", postal_code: "125009", country: "Россия" },
-  ])
+  const [addresses, setAddresses] = useState([])
 
   const [newAddress, setNewAddress] = useState({
     street: "",
@@ -30,38 +28,101 @@ export default function PlatformSettingsPage() {
     country: "",
   })
 
-  const handleProfileSave = async () => {
-    toast({
-      variant: "success",
-      title: "Профиль обновлен",
-      description: "Ваши данные успешно сохранены",
-    })
-  }
+  // Add useEffect to fetch data
+  useEffect(() => {
+    fetchProfile()
+    fetchAddresses()
+  }, [])
 
-  const handleAddAddress = () => {
-    if (newAddress.street && newAddress.city) {
-      setAddresses([
-        ...addresses,
-        {
-          id: Date.now(),
-          ...newAddress,
-        },
-      ])
-      setNewAddress({ street: "", city: "", postal_code: "", country: "" })
-      toast({
-        variant: "success",
-        title: "Адрес добавлен",
-        description: "Новый адрес успешно добавлен",
-      })
+  const fetchProfile = async () => {
+    try {
+      const response = await fetch("/api/platform/profile")
+      if (response.ok) {
+        const data = await response.json()
+        setProfile({
+          name: data.profile.name || "",
+          email: data.profile.email || user?.email || "",
+          phone: data.profile.phone || "",
+        })
+      }
+    } catch (error) {
+      console.error("Error fetching profile:", error)
     }
   }
 
-  const handleDeleteAddress = (id: number) => {
-    setAddresses(addresses.filter((addr) => addr.id !== id))
-    toast({
-      title: "Адрес удален",
-      description: "Адрес успешно удален из списка",
-    })
+  const fetchAddresses = async () => {
+    try {
+      const response = await fetch("/api/platform/addresses")
+      if (response.ok) {
+        const data = await response.json()
+        setAddresses(data.addresses)
+      }
+    } catch (error) {
+      console.error("Error fetching addresses:", error)
+    }
+  }
+
+  const handleProfileSave = async () => {
+    try {
+      const response = await fetch("/api/platform/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: profile.name, phone: profile.phone }),
+      })
+
+      if (response.ok) {
+        toast({
+          variant: "success",
+          title: "Профиль обновлен",
+          description: "Ваши данные успешно сохранены",
+        })
+      }
+    } catch (error) {
+      console.error("Error saving profile:", error)
+    }
+  }
+
+  const handleAddAddress = async () => {
+    if (newAddress.street && newAddress.city) {
+      try {
+        const response = await fetch("/api/platform/addresses", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newAddress),
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          setAddresses([...addresses, data.address])
+          setNewAddress({ street: "", city: "", postal_code: "", country: "" })
+          toast({
+            variant: "success",
+            title: "Адрес добавлен",
+            description: "Новый адрес успешно добавлен",
+          })
+        }
+      } catch (error) {
+        console.error("Error adding address:", error)
+      }
+    }
+  }
+
+  const handleDeleteAddress = async (id: string) => {
+    try {
+      const response = await fetch(`/api/platform/addresses/${id}`, {
+        method: "DELETE",
+      })
+
+      if (response.ok) {
+        setAddresses(addresses.filter((addr) => addr.id !== id))
+        toast({
+          title: "Адрес удален",
+          description: "Адрес успешно удален из списка",
+        })
+      }
+    } catch (error) {
+      console.error("Error deleting address:", error)
+    }
   }
 
   return (

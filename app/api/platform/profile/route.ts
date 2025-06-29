@@ -1,9 +1,11 @@
-import { createClient } from "@/lib/supabase"
-import { type NextRequest, NextResponse } from "next/server"
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
+import { cookies } from "next/headers"
+import { NextResponse } from "next/server"
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const supabase = createClient()
+    const cookieStore = cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
     const {
       data: { user },
@@ -19,28 +21,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    // If no profile exists, return user data from auth
-    if (!profile) {
-      return NextResponse.json({
+    return NextResponse.json({
+      profile: profile || {
+        user_id: user.id,
         name: user.user_metadata?.name || "",
         email: user.email || "",
         phone: "",
-      })
-    }
-
-    return NextResponse.json({
-      name: profile.name || user.user_metadata?.name || "",
-      email: user.email || "",
-      phone: profile.phone || "",
+      },
     })
   } catch (error) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
-export async function PUT(request: NextRequest) {
+export async function PUT(request: Request) {
   try {
-    const supabase = createClient()
+    const cookieStore = cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
     const {
       data: { user },
@@ -50,23 +47,16 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const body = await request.json()
-    const { name, phone } = body
+    const { name, phone } = await request.json()
 
-    // Upsert profile
     const { data, error } = await supabase
       .from("user_profiles")
-      .upsert(
-        {
-          user_id: user.id,
-          name,
-          phone,
-          updated_at: new Date().toISOString(),
-        },
-        {
-          onConflict: "user_id",
-        },
-      )
+      .upsert({
+        user_id: user.id,
+        name,
+        phone,
+        updated_at: new Date().toISOString(),
+      })
       .select()
       .single()
 
@@ -74,7 +64,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ success: true, data })
+    return NextResponse.json({ profile: data })
   } catch (error) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }

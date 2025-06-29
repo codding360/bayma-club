@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,16 +12,42 @@ import { useToast } from "@/hooks/use-toast"
 export default function PlatformPaymentsPage() {
   const { toast } = useToast()
 
-  const [payments] = useState([
-    { id: 1, date: "2024-01-15", amount: 45000, status: "completed", description: "Круиз по Средиземному морю" },
-    { id: 2, date: "2024-01-10", amount: 12000, status: "pending", description: "Доплата за каюту" },
-    { id: 3, date: "2024-01-05", amount: 78000, status: "completed", description: "Карибский круиз" },
-  ])
+  // Replace the useState for payments with API call
+  const [payments, setPayments] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  const [cards, setCards] = useState([
-    { id: 1, last_four: "4242", brand: "Visa", exp_month: 12, exp_year: 2025 },
-    { id: 2, last_four: "5555", brand: "Mastercard", exp_month: 8, exp_year: 2026 },
-  ])
+  useEffect(() => {
+    fetchPayments()
+    fetchCards()
+  }, [])
+
+  const fetchPayments = async () => {
+    try {
+      const response = await fetch("/api/platform/payments")
+      if (response.ok) {
+        const data = await response.json()
+        setPayments(data.payments)
+      }
+    } catch (error) {
+      console.error("Error fetching payments:", error)
+    }
+  }
+
+  const fetchCards = async () => {
+    try {
+      const response = await fetch("/api/platform/cards")
+      if (response.ok) {
+        const data = await response.json()
+        setCards(data.cards)
+      }
+    } catch (error) {
+      console.error("Error fetching cards:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const [cards, setCards] = useState([])
 
   const [newCard, setNewCard] = useState({
     number: "",
@@ -30,37 +56,46 @@ export default function PlatformPaymentsPage() {
     cvv: "",
   })
 
-  const handleAddCard = () => {
+  const handleAddCard = async () => {
     if (newCard.number && newCard.exp_month && newCard.exp_year && newCard.cvv) {
-      const lastFour = newCard.number.slice(-4)
-      const brand = newCard.number.startsWith("4") ? "Visa" : "Mastercard"
+      try {
+        const response = await fetch("/api/platform/cards", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newCard),
+        })
 
-      setCards([
-        ...cards,
-        {
-          id: Date.now(),
-          last_four: lastFour,
-          brand,
-          exp_month: Number.parseInt(newCard.exp_month),
-          exp_year: Number.parseInt(newCard.exp_year),
-        },
-      ])
-
-      setNewCard({ number: "", exp_month: "", exp_year: "", cvv: "" })
-      toast({
-        variant: "success",
-        title: "Карта добавлена",
-        description: "Новая карта успешно добавлена",
-      })
+        if (response.ok) {
+          const data = await response.json()
+          setCards([...cards, data.card])
+          setNewCard({ number: "", exp_month: "", exp_year: "", cvv: "" })
+          toast({
+            title: "Карта добавлена",
+            description: "Новая карта успешно добавлена",
+          })
+        }
+      } catch (error) {
+        console.error("Error adding card:", error)
+      }
     }
   }
 
-  const handleDeleteCard = (id: number) => {
-    setCards(cards.filter((card) => card.id !== id))
-    toast({
-      title: "Карта удалена",
-      description: "Карта успешно удалена",
-    })
+  const handleDeleteCard = async (id: number) => {
+    try {
+      const response = await fetch(`/api/platform/cards/${id}`, {
+        method: "DELETE",
+      })
+
+      if (response.ok) {
+        setCards(cards.filter((card) => card.id !== id))
+        toast({
+          title: "Карта удалена",
+          description: "Карта успешно удалена",
+        })
+      }
+    } catch (error) {
+      console.error("Error deleting card:", error)
+    }
   }
 
   const getStatusBadge = (status: string) => {

@@ -1,9 +1,11 @@
-import { createClient } from "@/lib/supabase"
-import { type NextRequest, NextResponse } from "next/server"
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
+import { cookies } from "next/headers"
+import { NextResponse } from "next/server"
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const supabase = createClient()
+    const cookieStore = cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
     const {
       data: { user },
@@ -13,18 +15,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Get total bookings
-    const { count: totalBookings } = await supabase
+    // Get user's bookings count
+    const { count: bookingsCount } = await supabase
       .from("bookings")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id)
-
-    // Get active bookings (confirmed or pending)
-    const { count: activeBookings } = await supabase
-      .from("bookings")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id)
-      .in("status", ["confirmed", "pending"])
 
     // Get total spent
     const { data: payments } = await supabase
@@ -35,27 +30,25 @@ export async function GET(request: NextRequest) {
 
     const totalSpent = payments?.reduce((sum, payment) => sum + payment.amount, 0) || 0
 
-    // Get upcoming tours count
-    const { count: upcomingTours } = await supabase
+    // Get recent bookings
+    const { data: recentBookings } = await supabase
       .from("bookings")
-      .select(
-        `
+      .select(`
         *,
-        tours!inner (
-          start_date
+        tours (
+          title
         )
-      `,
-        { count: "exact", head: true },
-      )
+      `)
       .eq("user_id", user.id)
-      .eq("status", "confirmed")
-      .gte("tours.start_date", new Date().toISOString())
+      .order("created_at", { ascending: false })
+      .limit(3)
 
     return NextResponse.json({
-      total_bookings: totalBookings || 0,
-      active_bookings: activeBookings || 0,
-      total_spent: Math.round((totalSpent || 0) / 100), // Convert from kopecks to rubles
-      upcoming_tours: upcomingTours || 0,
+      stats: {
+        activeBookings: bookingsCount || 0,
+        totalSpent,
+        recentBookings: recentBookings || [],
+      },
     })
   } catch (error) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })

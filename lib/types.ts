@@ -34,3 +34,59 @@ export interface Card {
   exp_year: number
   created_at: string
 }
+
+export interface Tour {
+  id: string
+  title: string
+  description: string
+  price: number
+  duration: number
+  category: string
+  destination: string
+  start_date: string
+  end_date: string
+  max_participants: number
+  created_by: string
+  created_at: string
+}
+
+export interface TourCategory {
+  id: string
+  name: string
+  description?: string
+  created_by: string
+  created_at: string
+}
+
+export interface Booking {
+  id: string
+  user_id: string
+  tour_id: string
+  participants: number
+  total_amount: number
+  status: "pending" | "confirmed" | "cancelled" | "completed"
+  special_requests?: string
+  created_at: string
+  tours?: Tour
+}
+
+export interface DashboardStats {
+  total_bookings: number
+  active_bookings: number
+  total_spent: number
+  upcoming_tours: number
+}
+
+export interface PaymentReport {
+  payments: Payment[]
+  summary: {
+    total_payments: number
+    total_amount: number
+    completed_count: number
+    completed_amount: number
+    pending_count: number
+    pending_amount: number
+    failed_count: number
+    failed_amount: number
+  }
+}

@@ -2,11 +2,12 @@
 ALTER DATABASE postgres SET row_security = on;
 
 -- User profiles table
-CREATE TABLE IF NOT EXISTS user_profiles (
+CREATE TABLE IF NOT EXISTS users (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   name TEXT,
   phone TEXT,
+  email TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(user_id)
@@ -88,15 +89,15 @@ CREATE TABLE IF NOT EXISTS payments (
 );
 
 -- Enable RLS on all tables
-ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_addresses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payment_cards ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
-CREATE POLICY "Users can view own profile" ON user_profiles FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can update own profile" ON user_profiles FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "Users can view own profile" ON users FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can update own profile" ON users FOR ALL USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can view own addresses" ON user_addresses FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can manage own addresses" ON user_addresses FOR ALL USING (auth.uid() = user_id);
@@ -115,7 +116,7 @@ CREATE POLICY "Anyone can view tours" ON tours FOR SELECT USING (is_active = tru
 CREATE POLICY "Anyone can view tour categories" ON tour_categories FOR SELECT USING (true);
 
 -- Indexes for performance
-CREATE INDEX idx_user_profiles_user_id ON user_profiles(user_id);
+CREATE INDEX idx_users_user_id ON users(user_id);
 CREATE INDEX idx_user_addresses_user_id ON user_addresses(user_id);
 CREATE INDEX idx_payment_cards_user_id ON payment_cards(user_id);
 CREATE INDEX idx_bookings_user_id ON bookings(user_id);

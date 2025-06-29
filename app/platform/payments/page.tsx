@@ -23,7 +23,7 @@ export default function PlatformPaymentsPage() {
 
   const fetchPayments = async () => {
     try {
-      const response = await fetch("/api/platform/payments")
+      const response = await fetch("/api/platform/payments", { credentials: "include"})
       if (response.ok) {
         const data = await response.json()
         setPayments(data.payments)
@@ -35,7 +35,7 @@ export default function PlatformPaymentsPage() {
 
   const fetchCards = async () => {
     try {
-      const response = await fetch("/api/platform/cards")
+      const response = await fetch("/api/platform/cards", { credentials: "include"})
       if (response.ok) {
         const data = await response.json()
         setCards(data.cards)
@@ -63,6 +63,7 @@ export default function PlatformPaymentsPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(newCard),
+          credentials: "include"
         })
 
         if (response.ok) {
@@ -84,6 +85,7 @@ export default function PlatformPaymentsPage() {
     try {
       const response = await fetch(`/api/platform/cards/${id}`, {
         method: "DELETE",
+        credentials: "include"
       })
 
       if (response.ok) {

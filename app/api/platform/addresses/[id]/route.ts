@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
     const {

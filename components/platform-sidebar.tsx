@@ -18,38 +18,9 @@ const navigation = [
   },
   {
     name: "Платежи",
-    href: "/platform/payments/reports",
+    href: "/platform/payments",
     icon: CreditCard,
-    subpages: [
-      {
-        name: "Квитанции",
-        href: "/platform/payments/reports",
-      },
-      {
-        name: "Карты",
-        href: "/platform/payments/cards",
-      },
-    ],
-  },
-  {
-    name: "Настройки",
-    href: "/platform/settings",
-    icon: Settings,
-    subpages: [
-      {
-        name: "Профиль",
-        href: "/platform/settings",
-      },
-      {
-        name: "Адреса",
-        href: "/platform/settings/addresses",
-      },
-      {
-        name: "Безопасность",
-        href: "/platform/settings/security",
-      },
-    ],
-  },
+  }
 ]
 
 const secondaryNavigation = [

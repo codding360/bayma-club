@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 
 export async function GET() {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
     const {
@@ -36,7 +36,7 @@ export async function GET() {
 
 export async function PUT(request: Request) {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
     const {
@@ -50,7 +50,7 @@ export async function PUT(request: Request) {
     const { name, phone } = await request.json()
 
     const { data, error } = await supabase
-      .from("user_profiles")
+      .from("users")
       .upsert({
         user_id: user.id,
         name,

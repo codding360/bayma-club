@@ -28,7 +28,7 @@ export default function PlatformPage() {
 
   const fetchDashboardStats = async () => {
     try {
-      const response = await fetch("/api/platform/dashboard/stats")
+      const response = await fetch("/api/platform/dashboard/stats", { credentials: "include"})
       if (response.ok) {
         const data = await response.json()
         setStats(data.stats)

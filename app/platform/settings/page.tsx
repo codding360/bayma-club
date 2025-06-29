@@ -36,7 +36,7 @@ export default function PlatformSettingsPage() {
 
   const fetchProfile = async () => {
     try {
-      const response = await fetch("/api/platform/profile")
+      const response = await fetch("/api/platform/profile", { credentials: "include"})
       if (response.ok) {
         const data = await response.json()
         setProfile({
@@ -52,7 +52,7 @@ export default function PlatformSettingsPage() {
 
   const fetchAddresses = async () => {
     try {
-      const response = await fetch("/api/platform/addresses")
+      const response = await fetch("/api/platform/addresses", {credentials: "include"})
       if (response.ok) {
         const data = await response.json()
         setAddresses(data.addresses)
@@ -68,6 +68,7 @@ export default function PlatformSettingsPage() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: profile.name, phone: profile.phone }),
+        credentials: "include"
       })
 
       if (response.ok) {
@@ -89,6 +90,7 @@ export default function PlatformSettingsPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(newAddress),
+          credentials: "include"
         })
 
         if (response.ok) {
@@ -111,6 +113,7 @@ export default function PlatformSettingsPage() {
     try {
       const response = await fetch(`/api/platform/addresses/${id}`, {
         method: "DELETE",
+        credentials: "include"
       })
 
       if (response.ok) {

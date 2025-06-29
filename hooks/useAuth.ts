@@ -34,7 +34,17 @@ export function useAuth() {
       password,
     })
 
-    if (error) {
+    console.log(error?.code)
+    console.log(error?.message)
+
+
+    if(error?.code === "email_not_confirmed"){
+      toast({
+        variant: "destructive",
+        title: "Почта не потверждена!",
+        description: "Что бы продолжить потвердите почту!",
+      })
+    }else if (error) {
       toast({
         variant: "destructive",
         title: "Ошибка входа",
@@ -75,7 +85,7 @@ export function useAuth() {
       toast({
         variant: "success",
         title: "Регистрация успешна!",
-        description: "Добро пожаловать в inCruises",
+        description: "Что бы продолжить потвердите почту!",
       })
     }
 

@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react"
 import type { User } from "@supabase/supabase-js"
 import { supabase } from "@/lib/supabase"
+import { useToast } from "@/hooks/use-toast"
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const { toast } = useToast()
 
   useEffect(() => {
     // Получаем текущего пользователя
@@ -31,6 +33,21 @@ export function useAuth() {
       email,
       password,
     })
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Ошибка входа",
+        description: "Неверный email или пароль",
+      })
+    } else {
+      toast({
+        variant: "success",
+        title: "Добро пожаловать!",
+        description: "Вы успешно вошли в систему",
+      })
+    }
+
     return { error }
   }
 
@@ -44,11 +61,37 @@ export function useAuth() {
         },
       },
     })
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Ошибка регистрации",
+        description:
+          error.message === "User already registered"
+            ? "Пользователь с таким email уже существует"
+            : "Произошла ошибка при регистрации",
+      })
+    } else {
+      toast({
+        variant: "success",
+        title: "Регистрация успешна!",
+        description: "Добро пожаловать в inCruises",
+      })
+    }
+
     return { error }
   }
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut()
+
+    if (!error) {
+      toast({
+        title: "До свидания!",
+        description: "Вы успешно вышли из системы",
+      })
+    }
+
     return { error }
   }
 

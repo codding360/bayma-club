@@ -41,100 +41,84 @@ export default function RegisterPage() {
 
     const { error } = await signUp(email, password, name)
 
-    if (error) {
-      setError(
-        error.message === "User already registered"
-          ? "Пользователь с таким email уже существует"
-          : "Ошибка при регистрации",
-      )
-    } else {
-      router.push("/dashboard")
+    if (!error) {
+      router.push("/platform")
     }
 
     setIsLoading(false)
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-teal-50 py-12 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="bg-blue-600 p-3 rounded-full">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 py-12 px-4">
+      <Card className="w-full max-w-md shadow-xl border-0">
+        <CardHeader className="text-center pb-8">
+          <div className="flex justify-center mb-6">
+            <div className="bg-slate-900 p-4 rounded-2xl">
               <Anchor className="h-8 w-8 text-white" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">Создать аккаунт</CardTitle>
-          <p className="text-gray-600">Присоединяйтесь к inCruises</p>
+          <CardTitle className="text-2xl font-light text-slate-900">Создать аккаунт</CardTitle>
+          <p className="text-slate-500 font-light">Присоединяйтесь к платформе inCruises</p>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">{error}</div>}
+        <CardContent className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm">{error}</div>
+            )}
 
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                Имя
-              </label>
-              <Input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Ваше имя"
-                required
-              />
-            </div>
+            <Input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Ваше имя"
+              required
+              className="h-12 border-slate-200 focus:border-slate-400 rounded-xl"
+            />
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email
-              </label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
-                required
-              />
-            </div>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              required
+              className="h-12 border-slate-200 focus:border-slate-400 rounded-xl"
+            />
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Пароль
-              </label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Минимум 6 символов"
-                required
-              />
-            </div>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Пароль (минимум 6 символов)"
+              required
+              className="h-12 border-slate-200 focus:border-slate-400 rounded-xl"
+            />
 
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                Подтвердите пароль
-              </label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Повторите пароль"
-                required
-              />
-            </div>
+            <Input
+              id="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Подтвердите пароль"
+              required
+              className="h-12 border-slate-200 focus:border-slate-400 rounded-xl"
+            />
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="w-full h-12 bg-slate-900 hover:bg-slate-800 rounded-xl font-medium"
+              disabled={isLoading}
+            >
               {isLoading ? "Создаем аккаунт..." : "Создать аккаунт"}
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
-            <div className="text-gray-600">
+          <div className="text-center">
+            <div className="text-slate-500 font-light">
               Уже есть аккаунт?{" "}
-              <Link href="/auth/login" className="text-blue-600 hover:underline">
+              <Link href="/auth/login" className="text-slate-900 hover:underline font-medium">
                 Войти
               </Link>
             </div>

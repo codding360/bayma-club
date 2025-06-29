@@ -15,7 +15,6 @@ export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
 
   const { signIn } = useAuth()
   const router = useRouter()
@@ -23,75 +22,70 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    setError("")
 
     const { error } = await signIn(email, password)
 
-    if (error) {
-      setError("Неверный email или пароль")
-    } else {
-      router.push("/dashboard")
+    if (!error) {
+      router.push("/platform")
     }
 
     setIsLoading(false)
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-teal-50 py-12 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="bg-blue-600 p-3 rounded-full">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 py-12 px-4">
+      <Card className="w-full max-w-md shadow-xl border-0">
+        <CardHeader className="text-center pb-8">
+          <div className="flex justify-center mb-6">
+            <div className="bg-slate-900 p-4 rounded-2xl">
               <Anchor className="h-8 w-8 text-white" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">Вход в аккаунт</CardTitle>
-          <p className="text-gray-600">Войдите в свой аккаунт inCruises</p>
+          <CardTitle className="text-2xl font-light text-slate-900">Вход в платформу</CardTitle>
+          <p className="text-slate-500 font-light">Войдите в свой рабочий кабинет</p>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">{error}</div>}
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email
-              </label>
+        <CardContent className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-2">
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
+                placeholder="Email"
                 required
+                className="h-12 border-slate-200 focus:border-slate-400 rounded-xl"
               />
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Пароль
-              </label>
+            <div className="space-y-2">
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Введите пароль"
+                placeholder="Пароль"
                 required
+                className="h-12 border-slate-200 focus:border-slate-400 rounded-xl"
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="w-full h-12 bg-slate-900 hover:bg-slate-800 rounded-xl font-medium"
+              disabled={isLoading}
+            >
               {isLoading ? "Входим..." : "Войти"}
             </Button>
           </form>
 
-          <div className="mt-6 text-center space-y-2">
-            <Link href="/auth/forgot-password" className="text-blue-600 hover:underline text-sm">
+          <div className="text-center space-y-4">
+            <Link href="/auth/forgot-password" className="text-slate-500 hover:text-slate-700 text-sm font-light">
               Забыли пароль?
             </Link>
-            <div className="text-gray-600">
+            <div className="text-slate-500 font-light">
               Нет аккаунта?{" "}
-              <Link href="/auth/register" className="text-blue-600 hover:underline">
+              <Link href="/auth/register" className="text-slate-900 hover:underline font-medium">
                 Зарегистрироваться
               </Link>
             </div>

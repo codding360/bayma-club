@@ -41,8 +41,8 @@ export default function Header() {
 
             {user ? (
               <div className="flex items-center space-x-4">
-                <Link href="/dashboard" className="hover:text-blue-200 transition-colors">
-                  Панель управления
+                <Link href="/platform" className="hover:text-blue-200 transition-colors">
+                  Платформа
                 </Link>
                 <Button
                   onClick={handleSignOut}
@@ -94,8 +94,8 @@ export default function Header() {
 
               {user ? (
                 <>
-                  <Link href="/dashboard" className="hover:text-blue-200 transition-colors">
-                    Панель управления
+                  <Link href="/platform" className="hover:text-blue-200 transition-colors">
+                    Платформа
                   </Link>
                   <Button
                     onClick={handleSignOut}

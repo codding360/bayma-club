@@ -1,21 +1,20 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
+import { createServerClient } from "@/lib/supabase"
 import { NextResponse } from "next/server"
 
 export async function GET() {
   try {
-    const cookieStore = await cookies()
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+    const supabase = createServerClient()
 
     const {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser()
+
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Get user's bookings count
+    // Get bookings count
     const { count: bookingsCount } = await supabase
       .from("bookings")
       .select("*", { count: "exact", head: true })
@@ -36,16 +35,17 @@ export async function GET() {
       .select(`
         *,
         tours (
-          title
+          title,
+          price
         )
       `)
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
-      .limit(3)
+      .limit(5)
 
     return NextResponse.json({
       stats: {
-        activeBookings: bookingsCount || 0,
+        bookingsCount: bookingsCount || 0,
         totalSpent,
         recentBookings: recentBookings || [],
       },

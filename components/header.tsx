@@ -41,8 +41,8 @@ export default function Header() {
 
             {user ? (
               <div className="flex items-center space-x-4">
-                <Link href="/platform" className="hover:text-blue-200 transition-colors">
-                  Платформа
+                <Link href="/platform">
+                  <Button className="bg-white text-blue-900 hover:bg-blue-50">Платформа</Button>
                 </Link>
                 <Button
                   onClick={handleSignOut}
@@ -93,18 +93,18 @@ export default function Header() {
               </Link>
 
               {user ? (
-                <>
-                  <Link href="/platform" className="hover:text-blue-200 transition-colors">
-                    Платформа
+                <div className="flex flex-col space-y-2">
+                  <Link href="/platform">
+                    <Button className="bg-white text-blue-900 hover:bg-blue-50 w-full">Платформа</Button>
                   </Link>
                   <Button
                     onClick={handleSignOut}
                     variant="outline"
-                    className="text-white border-white hover:bg-white hover:text-blue-900 w-fit bg-transparent"
+                    className="text-white border-white hover:bg-white hover:text-blue-900 w-full bg-transparent"
                   >
                     Выйти
                   </Button>
-                </>
+                </div>
               ) : (
                 <div className="flex flex-col space-y-2">
                   <Link href="/auth/login">

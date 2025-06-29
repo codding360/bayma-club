@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Ship, Settings, CreditCard, BarChart3, LogOut, User } from "lucide-react"
+import { Ship, Settings, CreditCard, BarChart3, LogOut, User, Globe } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
 import { Button } from "@/components/ui/button"
 
@@ -27,6 +27,14 @@ const navigation = [
     name: "Настройки",
     href: "/platform/settings",
     icon: Settings,
+  },
+]
+
+const secondaryNavigation = [
+  {
+    name: "На сайт",
+    href: "/",
+    icon: Globe,
   },
 ]
 
@@ -68,6 +76,19 @@ export default function PlatformSidebar() {
             </Link>
           )
         })}
+
+        <div className="pt-4 mt-4 border-t border-slate-200">
+          {secondaryNavigation.map((item) => (
+            <Link
+              key={item.name}
+              href={item.href}
+              className="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+            >
+              <item.icon className="mr-3 h-5 w-5" />
+              {item.name}
+            </Link>
+          ))}
+        </div>
       </nav>
 
       {/* User Profile */}

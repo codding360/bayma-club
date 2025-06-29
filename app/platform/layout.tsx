@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import PlatformSidebar from "@/components/platform-sidebar"
+import { Toaster } from "@/components/ui/toaster"
 
 export default function PlatformLayout({
   children,
@@ -33,11 +34,16 @@ export default function PlatformLayout({
   }
 
   return (
-    <div className="flex h-screen bg-slate-50">
-      <PlatformSidebar />
-      <main className="flex-1 overflow-y-auto">
-        <div className="p-8">{children}</div>
-      </main>
-    </div>
+    <html lang="ru">
+      <body className="font-sans">
+        <div className="flex h-screen bg-slate-50">
+          <PlatformSidebar />
+          <main className="flex-1 overflow-y-auto">
+            <div className="p-8">{children}</div>
+          </main>
+        </div>
+        <Toaster />
+      </body>
+    </html>
   )
 }

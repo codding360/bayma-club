@@ -1,10 +1,9 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
-import { NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase"
+import { type NextRequest, NextResponse } from "next/server"
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = createClient()
 
     const {
       data: { user },
@@ -27,16 +26,16 @@ export async function GET() {
       .eq("user_id", user.id)
       .in("status", ["confirmed", "pending"])
 
-    // Get total spent (completed payments)
-    const { data: completedPayments } = await supabase
+    // Get total spent
+    const { data: payments } = await supabase
       .from("payments")
       .select("amount")
       .eq("user_id", user.id)
       .eq("status", "completed")
 
-    const totalSpent = completedPayments?.reduce((sum, payment) => sum + payment.amount, 0) || 0
+    const totalSpent = payments?.reduce((sum, payment) => sum + payment.amount, 0) || 0
 
-    // Get upcoming tours count (bookings with future start dates)
+    // Get upcoming tours count
     const { count: upcomingTours } = await supabase
       .from("bookings")
       .select(
@@ -55,7 +54,7 @@ export async function GET() {
     return NextResponse.json({
       total_bookings: totalBookings || 0,
       active_bookings: activeBookings || 0,
-      total_spent: Math.round(totalSpent / 100), // Convert from cents to rubles
+      total_spent: Math.round((totalSpent || 0) / 100), // Convert from kopecks to rubles
       upcoming_tours: upcomingTours || 0,
     })
   } catch (error) {

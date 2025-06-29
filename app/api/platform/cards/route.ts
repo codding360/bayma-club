@@ -1,10 +1,9 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
+import { createClient } from "@/lib/supabase"
 import { type NextRequest, NextResponse } from "next/server"
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = createClient()
 
     const {
       data: { user },
@@ -32,7 +31,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = createClient()
 
     const {
       data: { user },
@@ -51,13 +50,7 @@ export async function POST(request: NextRequest) {
 
     // Extract last 4 digits and determine brand
     const last_four = number.slice(-4)
-    const brand = number.startsWith("4")
-      ? "Visa"
-      : number.startsWith("5")
-        ? "Mastercard"
-        : number.startsWith("3")
-          ? "American Express"
-          : "Unknown"
+    const brand = number.startsWith("4") ? "Visa" : number.startsWith("5") ? "Mastercard" : "Unknown"
 
     // If this is set as default, unset other defaults
     if (is_default) {

@@ -1,10 +1,9 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
+import { createClient } from "@/lib/supabase"
 import { type NextRequest, NextResponse } from "next/server"
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = createClient()
 
     const {
       data: { user },
@@ -14,18 +13,25 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { data: profile, error } = await supabase.from("user_profiles").select("*").eq("id", user.id).single()
+    const { data: profile, error } = await supabase.from("user_profiles").select("*").eq("user_id", user.id).single()
 
     if (error && error.code !== "PGRST116") {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    // If no profile exists, return user data from auth
+    if (!profile) {
+      return NextResponse.json({
+        name: user.user_metadata?.name || "",
+        email: user.email || "",
+        phone: "",
+      })
+    }
+
     return NextResponse.json({
-      id: user.id,
-      email: user.email,
-      name: profile?.name || user.user_metadata?.name || "",
-      phone: profile?.phone || "",
-      created_at: profile?.created_at || user.created_at,
+      name: profile.name || user.user_metadata?.name || "",
+      email: user.email || "",
+      phone: profile.phone || "",
     })
   } catch (error) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
@@ -34,7 +40,7 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = createClient()
 
     const {
       data: { user },
@@ -47,13 +53,20 @@ export async function PUT(request: NextRequest) {
     const body = await request.json()
     const { name, phone } = body
 
+    // Upsert profile
     const { data, error } = await supabase
       .from("user_profiles")
-      .upsert({
-        id: user.id,
-        name,
-        phone,
-      })
+      .upsert(
+        {
+          user_id: user.id,
+          name,
+          phone,
+          updated_at: new Date().toISOString(),
+        },
+        {
+          onConflict: "user_id",
+        },
+      )
       .select()
       .single()
 
@@ -61,7 +74,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json(data)
+    return NextResponse.json({ success: true, data })
   } catch (error) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }

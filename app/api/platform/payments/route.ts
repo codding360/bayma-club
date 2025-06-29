@@ -1,10 +1,9 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
+import { createClient } from "@/lib/supabase"
 import { type NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = createClient()
 
     const {
       data: { user },
@@ -16,15 +15,8 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const status = searchParams.get("status")
-    const limit = Number.parseInt(searchParams.get("limit") || "50")
-    const offset = Number.parseInt(searchParams.get("offset") || "0")
 
-    let query = supabase
-      .from("payments")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("payment_date", { ascending: false })
-      .range(offset, offset + limit - 1)
+    let query = supabase.from("payments").select("*").eq("user_id", user.id).order("payment_date", { ascending: false })
 
     if (status) {
       query = query.eq("status", status)
@@ -44,7 +36,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = createClient()
 
     const {
       data: { user },
@@ -57,15 +49,15 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { amount, description } = body
 
-    if (!amount || amount <= 0) {
-      return NextResponse.json({ error: "Invalid amount" }, { status: 400 })
+    if (!amount) {
+      return NextResponse.json({ error: "Amount is required" }, { status: 400 })
     }
 
     const { data, error } = await supabase
       .from("payments")
       .insert({
         user_id: user.id,
-        amount: Math.round(amount * 100), // Convert to cents
+        amount: Math.round(amount * 100), // Convert to kopecks
         status: "pending",
         description,
       })

@@ -17,37 +17,19 @@ const navigation = [
     name: "Туры",
     href: "/platform/tours",
     icon: Ship,
-    subpages: [
-      {
-        name: "Все туры",
-        href: "/platform/tours",
-      },
-      {
-        name: "Создать тур",
-        href: "/platform/tours/create",
-      },
-      {
-        name: "Категории",
-        href: "/platform/tours/categories",
-      },
-    ],
   },
   {
     name: "Платежи",
-    href: "/platform/payments",
+    href: "/platform/payments/reports",
     icon: CreditCard,
     subpages: [
       {
-        name: "Все платежи",
-        href: "/platform/payments",
+        name: "Квитанции",
+        href: "/platform/payments/reports",
       },
       {
         name: "Карты",
         href: "/platform/payments/cards",
-      },
-      {
-        name: "Отчеты",
-        href: "/platform/payments/reports",
       },
     ],
   },

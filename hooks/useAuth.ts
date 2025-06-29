@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react"
 import type { User } from "@supabase/supabase-js"
-import { supabase } from "@/lib/supabase"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { useToast } from "@/hooks/use-toast"
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const { toast } = useToast()
+  const supabase = createClientComponentClient()
 
   useEffect(() => {
     // Получаем текущего пользователя

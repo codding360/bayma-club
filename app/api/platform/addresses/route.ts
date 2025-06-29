@@ -13,13 +13,13 @@ export async function GET() {
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
-
+  
     const { data: addresses, error } = await supabase
       .from("user_addresses")
       .select("*")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
-
+    
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
